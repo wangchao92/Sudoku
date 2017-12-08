@@ -14,9 +14,9 @@ def generate(fileName):
 				if numbers[-1] == '*':
 					print '%4s' % '0',
 				else:
-					print '%4s' % str(int('0x' + numbers[-1].lower(), 0)),
+					print '%4s' % str(int('0x' + numbers[-1].lower(), 0) + 1),
 				print '},'
 		print '}'
 
 if __name__ == "__main__":
-	generate('hexa_challenging.txt')
+	generate('hexa_intermediate2.txt')

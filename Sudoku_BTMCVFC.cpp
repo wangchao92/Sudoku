@@ -41,15 +41,15 @@ bool SolveSudoku(int grid[N][N], vector< vector< unordered_set<ushort> > > sets)
     // consider digits 1 to 16
     for (auto num : sets[row][col]) {
         // if looks promising
-        if (isSafe(grid, row, col, num))
-        {
+        // if (isSafe(grid, row, col, num))
+        // {
             vector< vector< unordered_set<ushort> > > tmp = sets;
 
             // make tentative assignment
             grid[row][col] = num;
 
             if (updateSets(grid, num, row, col, tmp)) {
- 
+              
               // return, if success, yay!
               if (SolveSudoku(grid, tmp))
                   return true;
@@ -58,7 +58,7 @@ bool SolveSudoku(int grid[N][N], vector< vector< unordered_set<ushort> > > sets)
             
             // failure, unmake & try again
             grid[row][col] = UNASSIGNED;
-        }
+        // }
     }
     return false; // this triggers backtracking
 }
@@ -134,7 +134,7 @@ bool UsedInBox(int grid[N][N], int boxStartRow, int boxStartCol, int num)
                 return true;
     return false;
 }
- 
+
 /* Returns a boolean which indicates whether it will be legal to assign
    num to the given row,col location. */
 bool isSafe(int grid[N][N], int row, int col, int num)
@@ -161,7 +161,7 @@ void buildMap(vector< vector< unordered_set<ushort> > > &sets, int grid[N][N]) {
   for (int i = 0; i < N; i++) {
     vector< unordered_set<ushort> > row;
     for (int j = 0; j < N; j++) {
-      if (grid[i][j] != 0) {
+      if (grid[i][j] != UNASSIGNED) {
         unordered_set<ushort> empty;
         row.push_back(empty);
       } else {
@@ -174,7 +174,6 @@ void buildMap(vector< vector< unordered_set<ushort> > > &sets, int grid[N][N]) {
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
       if (grid[i][j] != UNASSIGNED) {
-        sets[i][j].erase(grid[i][j]);
         for (int k = 0; k < N; k++) sets[i][k].erase(grid[i][j]);
         for (int k = 0; k < N; k++) sets[k][j].erase(grid[i][j]);
         for (int ii = i - i%(int)sqrt(N); ii < i - i%(int)sqrt(N) + sqrt(N); ii++) {
@@ -192,22 +191,22 @@ int main()
 {
     // 0 means unassigned cells
     int grid[N][N] = {
-{   0,   0,  12,   0,   2,   1,  16,   7,   8,   0,   0,  11,   0,   9,  14,    0 },
-{   0,   0,   0,   0,   0,   0,   8,   0,   0,   0,   0,  12,   3,   0,   0,    0 },
-{   4,   0,   0,   5,  14,   0,   0,   9,   3,   0,  16,   0,   0,   0,   0,    0 },
-{   1,  16,   8,  13,   0,   0,   0,   0,   9,   7,  15,   0,   0,   0,   0,    0 },
-{   0,   0,   0,   7,  13,   0,   0,   0,   0,  14,   0,   0,   6,   0,   2,    0 },
-{  13,   0,   0,   0,   0,   0,   0,  15,  11,   0,   8,  10,   0,   0,   0,   11 },
-{   0,   0,  16,   9,   0,   0,  10,   0,   0,  12,   0,   0,  14,   0,  15,    0 },
-{   0,   0,   0,  15,   3,   2,   0,   0,   0,   0,   0,  13,  10,   7,   0,    0 },
-{   0,   4,   0,   0,   6,   7,   0,   1,   0,   0,   0,   0,  13,  16,   0,    0 },
-{  12,   0,   0,   0,   0,  15,   3,  16,   0,   0,   0,   0,   0,   0,   0,    0 },
-{   3,   0,   0,   0,   0,   0,   0,  12,  16,   0,   0,   0,   0,  15,   0,    4 },
-{  14,   0,   5,   0,   0,   0,   0,   0,   0,   0,   0,   7,   0,   8,   0,    0 },
-{   0,   8,   7,   0,  15,   6,   0,   0,   4,   0,   0,   0,   0,   0,  16,    0 },
-{   0,   6,   0,   0,   0,  11,   0,   0,  14,  10,   0,   0,   4,   0,   5,    0 },
-{   9,   0,  11,   0,   0,   0,   0,   8,   1,   0,   0,   0,   0,   0,   3,    0 },
-{   0,   0,  13,   0,  16,  12,   9,   0,   5,  11,   0,   0,  15,   0,   1,    6 }
+{  11,   2,   0,   0,   0,   3,   0,   0,  15,   9,   0,   0,  16,   0,  12,    0 },
+{   1,   9,   0,   0,  11,  12,   0,   0,   0,   5,   0,   0,   0,   0,   0,    2 },
+{   0,   0,   0,   0,   5,   0,   4,  16,   0,   0,   7,   0,   0,   0,   9,    0 },
+{   0,   0,   0,   0,   7,   0,   0,   0,  12,   0,  13,   0,   0,   0,  10,   11 },
+{   0,   0,   2,   5,   0,  15,   0,   0,   0,   0,   0,   0,  14,   4,   0,    6 },
+{   0,   0,   0,   4,  10,   2,   5,   7,   6,  14,   0,   0,   0,   0,   0,   16 },
+{   0,   8,   0,   0,  12,   0,   0,   0,   0,   4,   3,   0,   0,   0,   0,    0 },
+{   0,   0,   9,   0,   0,   0,   6,  14,   0,  10,   0,   0,  15,   0,   0,    0 },
+{   3,   1,   0,   0,   0,  10,   0,   0,  11,   0,  15,   0,  12,   0,   8,    0 },
+{  13,   0,   0,  10,   0,  14,  16,   0,   0,   1,   8,   0,   6,   0,   0,    0 },
+{  16,   7,   0,   0,   3,   0,   8,   0,   0,  12,   0,   5,   0,   9,  11,    0 },
+{  14,   5,  15,   0,   0,   1,   0,   0,   7,   0,   6,  10,  13,   0,   0,    0 },
+{  15,   0,   0,   0,   0,   0,   0,   0,   8,   0,   0,   1,   9,   0,   0,    0 },
+{   0,   0,   0,   0,   0,   0,  14,  13,   0,   0,   0,   0,   0,   5,   0,    8 },
+{   0,   4,   0,   6,   0,   5,   0,   0,   0,   0,  14,   3,  11,   0,   0,   12 },
+{   0,  13,   0,   0,   0,   0,   2,   0,   0,   7,  16,   0,   3,   0,  15,   14 },
 };
     vector< vector< unordered_set<ushort> > > sets;
     clock_t t1;
