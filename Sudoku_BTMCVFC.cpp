@@ -1,14 +1,14 @@
 // A Backtracking program  in C++ to solve Sudoku problem
 #include <stdio.h>
-#include <time.h>
+#include <chrono>
 #include <iostream>
 #include <math.h>
 #include <unordered_set>
+#include <unordered_map>
 #include <vector>
 
 using namespace std;
-
-#define CLOCKS_PER_MS (CLOCKS_PER_SEC / 1000)
+using namespace std::chrono;
 
 // UNASSIGNED is used for empty cells in sudoku grid
 #define UNASSIGNED 0
@@ -16,6 +16,8 @@ using namespace std;
 // N is used for size of Sudoku grid. Size will be NxN
 #define N 16
  
+void LCV(const vector< vector< unordered_set<ushort> > > &sets, vector<ushort> &candidates, int row, int col);
+
 // This function finds an entry in grid that is still unassigned
 bool FindMCVLocation(int grid[N][N], const vector< vector< unordered_set<ushort> > > &sets, int &row, int &col);
  
@@ -38,8 +40,13 @@ bool SolveSudoku(int grid[N][N], vector< vector< unordered_set<ushort> > > sets)
 
     if (row == -1 || col == -1) return false;
     
-    // consider digits 1 to 16
+    // vector<ushort> candidates;
+    // LCV(sets, candidates, row, col);
+
+    // consider digits LCV
     for (auto num : sets[row][col]) {
+      // LCV
+      // if (sets[row][col].find(num) == sets[row][col].end()) continue;
         // if looks promising
         // if (isSafe(grid, row, col, num))
         // {
@@ -61,6 +68,39 @@ bool SolveSudoku(int grid[N][N], vector< vector< unordered_set<ushort> > > sets)
         // }
     }
     return false; // this triggers backtracking
+}
+
+bool sortbysec(const pair<ushort,ushort> &a,
+              const pair<ushort,ushort> &b)
+{
+    return (a.second < b.second);
+}
+
+void LCV(const vector< vector< unordered_set<ushort> > > &sets, vector<ushort> &candidates, int row, int col) {
+  unordered_map<ushort, ushort> hashmap;
+
+  for (int k = 0; k < N; k++) {
+    for (auto num : sets[row][k]) {
+      hashmap[num] += 1;
+    }
+  }
+  for (int k = 0; k < N; k++) {
+    for (auto num : sets[k][col]) {
+      hashmap[num] += 1;
+    }
+  }
+  for (int ii = row - row%(int)sqrt(N); ii < row - row%(int)sqrt(N) + sqrt(N); ii++) {
+    for (int jj = col - col%(int)sqrt(N); jj < col - col%(int)sqrt(N) + sqrt(N); jj++) {
+      for (auto num : sets[ii][jj]) {
+        hashmap[num] += 1;
+      }
+    }
+  }
+  vector< pair<ushort, ushort> > v(hashmap.begin(), hashmap.end());
+  sort(v.begin(), v.end(), sortbysec);
+  for (auto num : v) {
+    candidates.push_back(num.first);
+  }
 }
 
 bool updateSets(int grid[N][N], int num, int row, int col, vector< vector< unordered_set<ushort> > > &sets) {
@@ -191,32 +231,32 @@ int main()
 {
     // 0 means unassigned cells
     int grid[N][N] = {
-{  11,   2,   0,   0,   0,   3,   0,   0,  15,   9,   0,   0,  16,   0,  12,    0 },
-{   1,   9,   0,   0,  11,  12,   0,   0,   0,   5,   0,   0,   0,   0,   0,    2 },
-{   0,   0,   0,   0,   5,   0,   4,  16,   0,   0,   7,   0,   0,   0,   9,    0 },
-{   0,   0,   0,   0,   7,   0,   0,   0,  12,   0,  13,   0,   0,   0,  10,   11 },
-{   0,   0,   2,   5,   0,  15,   0,   0,   0,   0,   0,   0,  14,   4,   0,    6 },
-{   0,   0,   0,   4,  10,   2,   5,   7,   6,  14,   0,   0,   0,   0,   0,   16 },
-{   0,   8,   0,   0,  12,   0,   0,   0,   0,   4,   3,   0,   0,   0,   0,    0 },
-{   0,   0,   9,   0,   0,   0,   6,  14,   0,  10,   0,   0,  15,   0,   0,    0 },
-{   3,   1,   0,   0,   0,  10,   0,   0,  11,   0,  15,   0,  12,   0,   8,    0 },
-{  13,   0,   0,  10,   0,  14,  16,   0,   0,   1,   8,   0,   6,   0,   0,    0 },
-{  16,   7,   0,   0,   3,   0,   8,   0,   0,  12,   0,   5,   0,   9,  11,    0 },
-{  14,   5,  15,   0,   0,   1,   0,   0,   7,   0,   6,  10,  13,   0,   0,    0 },
-{  15,   0,   0,   0,   0,   0,   0,   0,   8,   0,   0,   1,   9,   0,   0,    0 },
-{   0,   0,   0,   0,   0,   0,  14,  13,   0,   0,   0,   0,   0,   5,   0,    8 },
-{   0,   4,   0,   6,   0,   5,   0,   0,   0,   0,  14,   3,  11,   0,   0,   12 },
-{   0,  13,   0,   0,   0,   0,   2,   0,   0,   7,  16,   0,   3,   0,  15,   14 },
+{   0,  15,   0,   0,   0,  11,   0,   9,   0,   0,   0,   0,   0,  12,  16,   13 },
+{   5,   0,   0,   0,   0,   0,   0,   0,  14,   7,   0,  11,   0,   0,   0,    0 },
+{   0,  16,   9,  12,   5,  15,   0,  13,   0,   0,  10,   0,   0,   0,  14,    0 },
+{   0,   0,   0,   0,   0,   0,   4,  10,   0,   0,   0,   0,   0,   0,   0,    9 },
+{   0,   0,   0,   0,   0,   0,   6,  15,   0,   0,   0,   0,   0,   0,   0,    0 },
+{   0,   0,  15,  16,   0,   0,  13,  14,   0,   3,   0,   0,   1,   4,   0,   12 },
+{   0,   8,   0,  11,   0,   0,   0,   0,   0,   0,   2,   0,   0,   0,  10,    3 },
+{  14,   9,   0,  13,  12,   0,   0,   0,   0,  10,   0,   1,   0,   2,  11,   16 },
+{   0,  12,  16,   6,   0,   8,  15,   0,   0,   0,   0,   0,   0,   0,   9,    0 },
+{  15,   0,   0,   9,  13,   6,  12,   4,   7,   0,  16,   2,   0,   0,   0,   14 },
+{   0,   0,  14,   0,  16,   0,   0,   0,   9,   6,   0,   0,   5,  11,   1,    0 },
+{   0,   0,   0,   0,   9,   0,   0,   0,   0,   0,   8,   0,   0,   0,   0,    0 },
+{   0,   7,   0,   0,  10,   1,   0,   0,  11,   8,   5,   0,  13,   0,   3,    4 },
+{   0,  14,   0,   5,   0,   3,   0,   0,  16,   2,   7,   0,   0,  15,   0,    8 },
+{  10,   0,   0,  15,   0,   0,   0,  12,   1,   0,   0,   6,   0,   0,   0,    0 },
+{   0,  13,   0,   0,   0,  16,   0,   0,   0,   0,  12,   3,   2,   0,   0,    5 }
 };
     vector< vector< unordered_set<ushort> > > sets;
-    clock_t t1;
-    t1 = clock();
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
     buildMap(sets, grid);
     if (SolveSudoku(grid, sets) == true)
           printGrid(grid);
     else
          printf("No solution exists");
-    unsigned timeElapsed = (clock() - t1) / CLOCKS_PER_MS;
-    cout << timeElapsed << endl;
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>( t2 - t1 ).count();
+    cout << duration << endl;
     return 0;
 }
